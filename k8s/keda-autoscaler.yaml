@@ -1,0 +1,16 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: llm-gateway-scaler
+spec:
+  scaleTargetRef:
+    name: llm-gateway
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  triggers:
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-service:9090
+      metricName: http_requests_total
+      query: sum(rate(http_requests_total{job="llm-gateway"}[1m]))
+      threshold: "50"
